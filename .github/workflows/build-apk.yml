@@ -1,0 +1,36 @@
+name: Compilar APK Android
+on:
+  push:
+    branches: [ "**" ]
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Compilar APK con Gradle
+        run: |
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper
+          fi
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+      - name: Renombrar APK generado
+        run: |
+          mkdir -p output
+          cp app/build/outputs/apk/debug/app-debug.apk output/X-Message-Adapter.apk
+      - name: Subir APK como artefacto de descarga
+        uses: actions/upload-artifact@v4
+        with:
+          name: X-Message-Adapter-APK
+          path: output/X-Message-Adapter.apk
+          retention-days: 30
