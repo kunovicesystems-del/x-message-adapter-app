@@ -15,20 +15,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Configurar Gradle
+      - name: Configurar Gradle 8.4
         uses: gradle/actions/setup-gradle@v3
-      - name: Compilar APK con Gradle
-        run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
-      - name: Renombrar APK generado
+        with:
+          gradle-version: '8.4'
+      - name: Compilar APK
+        run: gradle assembleDebug --stacktrace
+      - name: Renombrar y guardar APK
         run: |
           mkdir -p output
           cp app/build/outputs/apk/debug/app-debug.apk output/X-Message-Adapter.apk
-      - name: Subir APK como artefacto de descarga
+      - name: Subir APK listo para descargar
         uses: actions/upload-artifact@v4
         with:
           name: X-Message-Adapter-APK
